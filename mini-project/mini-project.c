@@ -29,7 +29,7 @@ void generateMap(char map[SIZE][SIZE], int lines, int cols){
 }
 
 void readFile(FILE * fp, char map[SIZE][SIZE], int *totalLines, int *totalCols) {
-  int line, col, initFlag = 1;
+  int line, col, initFlag = 1, n;
   char text[STR_LEN] = "",
        type[STR_LEN],
        space1,
@@ -38,7 +38,13 @@ void readFile(FILE * fp, char map[SIZE][SIZE], int *totalLines, int *totalCols) 
   while(fscanf(fp, " %[^\n]s", text) != EOF) {
     if (text[0] != '#') {
       if (text[0] == '.' || text[0] == '*') {
-        sscanf(text, "%s%c%d%c%d", type, &space1, &line, &space2, &col);
+        n = sscanf(text, "%s%c%d%c%d", type, &space1, &line, &space2, &col);
+
+        if (n != 5) {
+          generateMap(map, SIZE, SIZE);
+          puts("File is corrupted");
+          return;
+        }
 
         if ((space1 != ' ' && space1 != '\t') || (space2 != ' ' && space2 != '\t')) {
           generateMap(map, SIZE, SIZE);
