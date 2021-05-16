@@ -40,6 +40,12 @@ void readFile(FILE * fp, char map[SIZE][SIZE], int *totalLines, int *totalCols) 
       if (text[0] == '.' || text[0] == '*') {
         n = sscanf(text, "%s%c%d%c%d", type, &space1, &line, &space2, &col);
 
+        if (initFlag) {
+          generateMap(map, SIZE, SIZE);
+          puts("File is corrupted");
+          return;
+        }
+
         if (n != 5) {
           generateMap(map, SIZE, SIZE);
           puts("File is corrupted");
@@ -63,7 +69,13 @@ void readFile(FILE * fp, char map[SIZE][SIZE], int *totalLines, int *totalCols) 
 
       else {
         if (initFlag) {
-          sscanf(text, "%d %d", &*totalLines, &*totalCols);
+          n = sscanf(text, "%d %d", &*totalLines, &*totalCols);
+
+          if (n != 2) {
+            generateMap(map, SIZE, SIZE);
+            puts("File is corrupted");
+            return;
+          }
 
           if (*totalLines != SIZE || *totalCols != SIZE) {
             *totalLines = SIZE;
