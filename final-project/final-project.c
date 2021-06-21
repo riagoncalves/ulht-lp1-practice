@@ -102,7 +102,7 @@ int addEvent(event ** first, event p, char ** map, int totalLines, int totalCols
 
     for (t = *first ; t != NULL ; t = t -> next)
     {
-      if (p.time >= t -> time)
+      if (aux -> time >= t -> time)
       {
         if (t -> next == NULL)
         {
@@ -110,8 +110,8 @@ int addEvent(event ** first, event p, char ** map, int totalLines, int totalCols
           
           return 1;
         }
-        else if ((t->next) -> time >= p.time ) {
-          p.next = t -> next;
+        else if (t -> next -> time >= aux -> time ) {
+          aux -> next = t -> next;
           t -> next = aux;
           
           return 1;
@@ -129,7 +129,7 @@ int addEvent(event ** first, event p, char ** map, int totalLines, int totalCols
 	return 1;
 }
 
-int deleteEvent (event ** first)
+int popEvent (event ** first)
 {
 	event * aux;
 	if (*first == NULL)
@@ -142,6 +142,43 @@ int deleteEvent (event ** first)
 
 	free(aux);
 
+  return 1;
+}
+
+int deleteEvent (event ** first, event * p)
+{
+	event * aux;
+  event * t;
+
+
+	if (*first == NULL)
+  {
+		return 0;
+  }
+
+  aux = p;
+
+	for (t = *first ; t != NULL ; t = t -> next)
+  {
+    if (t -> next == NULL)
+    {
+      return 0;
+    }
+
+    if (t == *first && t -> x == aux -> x && t -> y == aux -> y)
+    {
+      popEvent(first);
+      return 1;
+    }
+
+    if (t -> next -> x == aux -> x && t -> next -> y == aux -> y) {
+      t -> next = t -> next -> next;
+      free(aux);
+      return 1;
+    }
+    
+  }
+  
   return 1;
 }
 
@@ -244,47 +281,6 @@ void generateEvents(event * first, char ** map, int totalLines, int totalCols, i
   addEvent(&first, rightBot, map, totalLines, totalCols, checkRightBot);
   addEvent(&first, right, map, totalLines, totalCols, checkRight);
   addEvent(&first, rightTop, map, totalLines, totalCols, checkRightTop);
-
-  if (checkTop)
-  {
-    generateEvents(first, map, totalLines, totalCols, previousLine, col, currentTime + 10);
-  }
-
-  if (checkLeftTop)
-  {
-    generateEvents(first, map, totalLines, totalCols, previousLine, previousCol, currentTime + 11);
-  }
-
-  if (checkLeft)
-  {
-    generateEvents(first, map, totalLines, totalCols, line, previousCol, currentTime + 12);
-  }
-  
-  if (checkLeftBot)
-  {
-    generateEvents(first, map, totalLines, totalCols, nextLine, previousCol, currentTime + 13);
-  }
-
-  if (checkBot)
-  {
-    generateEvents(first, map, totalLines, totalCols, nextLine, col, currentTime + 14);
-  }
-  
-  if (checkRightBot)
-  {
-    generateEvents(first, map, totalLines, totalCols, nextLine, nextCol, currentTime + 15);
-  }
-  
-  if (checkRight)
-  {
-    generateEvents(first, map, totalLines, totalCols, line, nextCol, currentTime + 16);
-  }
-
-  if (checkRightTop)
-  {
-    generateEvents(first, map, totalLines, totalCols, previousLine, nextCol, currentTime + 17);
-  }
-  
 }
 
 char ** readFile(FILE * fp, int *totalLines, int *totalCols) {
@@ -410,6 +406,7 @@ int execution(char ** map, int totalLines, int totalCols) {
   FILE *file;
   event * first = NULL;
   event p;
+  event *t;
 
   menu();
 
@@ -448,11 +445,15 @@ int execution(char ** map, int totalLines, int totalCols) {
       p.next = NULL;
 
       addEvent(&first, p, map, totalLines, totalCols, 1);
-      
-      generateEvents(first, map, totalLines, totalCols, coordX, coordY, currentTime);
+
+      for (t = first ; t != NULL ; t = t -> next)
+      {
+        generateEvents(first, map, totalLines, totalCols, t -> x, t -> y, t -> time);
+      }
+
       currentTime = getLastCurrentTime(&first);
       list(first, map, totalLines, totalCols, 1);
-      while (deleteEvent(&first));
+      while (popEvent(&first));
 
       break;
 
@@ -480,10 +481,14 @@ int execution(char ** map, int totalLines, int totalCols) {
 
       addEvent(&first, p, map, totalLines, totalCols, 1);
       
-      generateEvents(first, map, totalLines, totalCols, coordX, coordY, currentTime);
+     for (t = first ; t != NULL ; t = t -> next)
+      {
+        generateEvents(first, map, totalLines, totalCols, t -> x, t -> y, t -> time);
+      }
+
       currentTime = getLastCurrentTime(&first);
       list(first, map, totalLines, totalCols, 0);
-      while (deleteEvent(&first));   
+      while (popEvent(&first)); 
 
       break;
 
