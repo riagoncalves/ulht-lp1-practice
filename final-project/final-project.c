@@ -33,9 +33,9 @@ char ** generateMap(int lines, int cols) {
   int i, k;
   char ** map;
 
-  map = (char **)malloc(lines * sizeof(char*));
+  map = (char **)calloc(lines, sizeof(char*));
 
-  for(i=0; i<lines; i++){
+  for(i = 0; i < lines; i++) {
     map[i] = (char *)malloc(cols * sizeof(char));
   }
   
@@ -81,7 +81,7 @@ void list(event * first, char ** map, int totalLines, int totalCols, int isPropa
 
 int addEvent(event ** first, event p, char ** map, int totalLines, int totalCols, int check)
 {
-	event * aux = (event *) malloc(sizeof(event));
+	event * aux;
   event * t;
 
   if (!check || p.x < 0 || p.y < 0 || p.x >= totalLines || p.y >= totalCols || map[p.x][p.y] != BOMB_ON)
@@ -89,6 +89,8 @@ int addEvent(event ** first, event p, char ** map, int totalLines, int totalCols
     
     return 0;
   }
+
+  aux = (event *) malloc(sizeof(event));
 
 	if (aux == NULL)
   {
@@ -142,43 +144,6 @@ int popEvent (event ** first)
 
 	free(aux);
 
-  return 1;
-}
-
-int deleteEvent (event ** first, event * p)
-{
-	event * aux;
-  event * t;
-
-
-	if (*first == NULL)
-  {
-		return 0;
-  }
-
-  aux = p;
-
-	for (t = *first ; t != NULL ; t = t -> next)
-  {
-    if (t -> next == NULL)
-    {
-      return 0;
-    }
-
-    if (t == *first && t -> x == aux -> x && t -> y == aux -> y)
-    {
-      popEvent(first);
-      return 1;
-    }
-
-    if (t -> next -> x == aux -> x && t -> next -> y == aux -> y) {
-      t -> next = t -> next -> next;
-      free(aux);
-      return 1;
-    }
-    
-  }
-  
   return 1;
 }
 
@@ -325,6 +290,7 @@ char ** readFile(FILE * fp, int *totalLines, int *totalCols) {
 
           if (n != 2) {
             puts(MSG_FILE_CRP);
+
             return NULL;
           }
 
@@ -406,7 +372,7 @@ int execution(char ** map, int totalLines, int totalCols) {
   FILE *file;
   event * first = NULL;
   event p;
-  event *t;
+  event * t;
 
   menu();
 
@@ -495,10 +461,6 @@ int execution(char ** map, int totalLines, int totalCols) {
     case 4:
       scanf("%d %d", &coordX, &coordY);
 
-      if (map[0][0] != NO_BOMB && map[0][0] != BOMB_OFF && map[0][0] != BOMB_ON) {
-        generateMap(totalLines, totalCols);
-      }
-
       if (coordX < 0 || coordX >= totalLines || coordY < 0 || coordY >= totalCols) {
         puts(MSG_INVAL_CRD);
         break;
@@ -546,6 +508,7 @@ int main(int argc, char * argv[]) {
   char ** map;
   int starterLines, starterCols;
   FILE *file;
+  int i;
 
   if(argc == 1)
   {
@@ -574,6 +537,12 @@ int main(int argc, char * argv[]) {
   }
 
   execution(map, starterLines, starterCols);
+
+  for(i = 0; i < starterLines; i++) {
+    free(map[i]);
+  }
+
+  free(map);
 
   return 0;
 }
