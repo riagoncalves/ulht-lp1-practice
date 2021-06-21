@@ -10,10 +10,10 @@
 #define NO_BOMB '_'
 
 typedef struct _event {
-	int x;
+  int x;
   int y;
-	int time;
-	struct _event * next;
+  int time;
+  struct _event * next;
 } event;
 
 
@@ -63,25 +63,25 @@ void showMap(char ** map, int totalLines, int totalCols) {
 
 void list(event * first, char ** map, int totalLines, int totalCols, int isPropagate)
 {
-	event * t;
+  event * t;
 
-	for (t = first ; t != NULL ; t = t -> next)
-	{
+  for (t = first ; t != NULL ; t = t -> next)
+  {
     map[t->x][t->y] = BOMB_OFF;
     if (isPropagate)
     {
       showMap(map, totalLines, totalCols);
     }
     else {
-		  printf("%d [%d, %d]\n", t->time, t->x, t->y);
+      printf("%d [%d, %d]\n", t->time, t->x, t->y);
     }
     
-	}
+  }
 }
 
 int addEvent(event ** first, event p, char ** map, int totalLines, int totalCols, int check)
 {
-	event * aux;
+  event * aux;
   event * t;
 
   if (!check || p.x < 0 || p.y < 0 || p.x >= totalLines || p.y >= totalCols || map[p.x][p.y] != BOMB_ON)
@@ -92,15 +92,15 @@ int addEvent(event ** first, event p, char ** map, int totalLines, int totalCols
 
   aux = (event *) malloc(sizeof(event));
 
-	if (aux == NULL)
+  if (aux == NULL)
   {
-		return 0;
+    return 0;
   }
-	
-	*aux = p;
+  
+  *aux = p;
 
-	if (*first != NULL)
-	{
+  if (*first != NULL)
+  {
 
     for (t = *first ; t != NULL ; t = t -> next)
     {
@@ -123,26 +123,26 @@ int addEvent(event ** first, event p, char ** map, int totalLines, int totalCols
       
     }
     
-		return 1;
-	}
+    return 1;
+  }
 
-	*first = aux;
+  *first = aux;
 
-	return 1;
+  return 1;
 }
 
 int popEvent (event ** first)
 {
-	event * aux;
-	if (*first == NULL)
+  event * aux;
+  if (*first == NULL)
   {
-		return 0;
+    return 0;
   }
 
-	aux = *first;
-	*first = aux -> next;
+  aux = *first;
+  *first = aux -> next;
 
-	free(aux);
+  free(aux);
 
   return 1;
 }
@@ -171,7 +171,7 @@ void generateEvents(event * first, char ** map, int totalLines, int totalCols, i
   }
 
   for (t = first ; t != NULL ; t = t -> next)
-	{
+  {
     if (t -> x == previousLine && t -> y == col) {
       checkTop = 0;
     }
@@ -196,7 +196,7 @@ void generateEvents(event * first, char ** map, int totalLines, int totalCols, i
     else if (t -> x == previousLine && t -> y == nextCol) {
       checkRightTop = 0;
     }
-	}
+  }
 
   top.x = previousLine;
   top.y = col;
